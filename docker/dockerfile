@@ -1,0 +1,23 @@
+FROM postgres:latest
+
+# Install build dependencies and pg_cron
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    postgresql-server-dev-all \
+    postgresql-contrib \
+    build-essential \
+    git \
+    ca-certificates \
+    && git clone https://github.com/citusdata/pg_cron.git \
+    && cd pg_cron \
+    && make \
+    && make install \
+    && cd .. \
+    && rm -rf pg_cron \
+    && apt-get purge -y \
+    postgresql-server-dev-all \
+    build-essential \
+    git \
+    && apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
