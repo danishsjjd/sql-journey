@@ -1,4 +1,9 @@
 -- Create schemas to simulate databases
+DROP SCHEMA IF EXISTS sql_invoicing CASCADE;
+DROP SCHEMA IF EXISTS sql_store CASCADE;
+DROP SCHEMA IF EXISTS sql_hr CASCADE;
+DROP SCHEMA IF EXISTS sql_inventory CASCADE;
+
 CREATE SCHEMA IF NOT EXISTS sql_invoicing;
 CREATE SCHEMA IF NOT EXISTS sql_store;
 CREATE SCHEMA IF NOT EXISTS sql_hr;
