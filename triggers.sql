@@ -83,3 +83,41 @@ DELETE FROM users
 WHERE id = 1;
 SELECT *
 FROM audits;
+----------------
+----------------
+----------------
+----------------
+create or replace function sql_invoicing.payments_after_insert() returns trigger as $$ begin
+update sql_invoicing.invoices
+set payment_total = payment_total + new.amount
+where invoice_id = new.invoice_id;
+return new;
+end;
+$$ language plpgsql;
+create or replace trigger payments_after_insert
+after
+insert on sql_invoicing.payments for each row execute procedure sql_invoicing.payments_after_insert();
+insert into sql_invoicing.payments
+values (9, 3, 3, '2025-01-01', 10, 1);
+---
+create or replace function payments_after_delete() returns trigger as $$
+declare invoice_payment_total int := 0;
+begin
+select payment_total into invoice_payment_total
+from sql_invoicing.invoices i
+where i.invoice_id = old.invoice_id;
+update sql_invoicing.invoices i
+set payment_total = payment_total - old.amount
+where invoice_id = old.invoice_id;
+-- for debugging
+raise notice 'new=%, old=%, invoice_payment_total=%',
+new,
+old,
+invoice_payment_total - old.amount;
+return new;
+end $$ language plpgsql;
+create or replace trigger payments_after_delete
+after delete on sql_invoicing.payments for each row execute procedure payments_after_delete();
+delete from sql_invoicing.payments p
+where p.payment_id = 9;
+-- returning null from before delete trigger cause it to stop deleting the row so please don't return new from it
