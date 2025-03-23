@@ -146,3 +146,22 @@ FROM sql_store.customers c
 WHERE c.customer_id = 1;
 -- REPEATABLE READ solves this issue but introduces phantom reads
 -- Use SERIALIZABLE isolation level to prevent phantom reads
+
+-- Dead locks
+-- Step 1: 1st connection
+begin;
+update sql_store.customers set state = 'VA' where customer_id = 1;
+-- Step 2: 2nd connection
+begin;
+update sql_store.orders set status = 1 where order_id = 1;
+-- Step 3: 1st connection
+update sql_store.orders set status = 1 where order_id = 1;
+-- Step 4: 2nd connection
+update sql_store.customers set state = 'VA' where customer_id = 1;
+
+-- Deadlocks are rare but should still be handled properly
+-- If deadlocks occur frequently between two transactions, review their code and consider reordering the update statements
+-- Write application code to automatically retry transactions that get rolled back due to deadlocks
+-- Keep transactions small and short in duration
+-- For long-running transactions, consider scheduling them during off-peak hours
+-- Provide appropriate error handling and user feedback when transactions fail
