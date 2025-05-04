@@ -6,8 +6,9 @@
       "port": 5432,
       "driver": "PostgreSQL",
       "name": "postgres",
+      "database": "mydb",
       "username": "user",
-      "database": "mydb"
+      "password": "password"
     }
   ],
   "makefile.configureOnOpen": true,
